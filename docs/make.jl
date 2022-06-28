@@ -15,5 +15,12 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
+        "Functions" => "functions.md"
     ],
+
+    
+)
+
+deploydocs(
+    repo = "github.com/jobosse/ComplGinzLandEq.jl",
 )
