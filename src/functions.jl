@@ -16,6 +16,8 @@ Solves the complex Ginsburg Landau differential differential equation.
 * tspan = (0.,15.)
 * α=2.
 * β=-1.
+
+Test change
 """
 function CGLE(g::Grid2D, u0::AbstractArray; tspan = (0.,15.), α=2., β=-1.)
     if !(size(g.y_grid) == size(u0))
