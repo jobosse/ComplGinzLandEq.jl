@@ -19,7 +19,7 @@ Solves the complex Ginsburg Landau differential differential equation.
 
 Test change
 """
-function CGLE(g::Grid2D, u0::AbstractArray; tspan = (0.,15.), α=2., β=-1.)
+function CGLE(g::Grid2D, u0::AbstractArray; tspan = (0.,200.), α=2., β=-1.)
     if !(size(g.y_grid) == size(u0))
         @error "The grid g and the initial conditions are not compatible due to different sizes"
     end
@@ -28,7 +28,7 @@ function CGLE(g::Grid2D, u0::AbstractArray; tspan = (0.,15.), α=2., β=-1.)
     u0 = reshape(u0, :) 
     function f!(du,u,p,t)
         α, β = p
-        du .= (1+(α)im) .* Δ(u) - (1 +(β)im) * u'*u .* u
+        du .= (1+(α)im) .* Δ(u) - (1 +(β)im) * u'*u .* u + u
     end
 
     prob = ODEProblem(f!, u0, tspan, [α, β])
@@ -51,7 +51,7 @@ function animateSol(sol; name="CGLE")
     n = Int(sqrt(length(sol.u[1,:][1])))
 
     anim = Plots.@animate for t ∈ tspan
-        Plots.heatmap(reshape(real.(sol(t)),n,n),clims=(0 ,1))
+        Plots.heatmap(reshape(real.(sol(t)),n,n),clim=(0. ,1.5))
     end
     
     gif(anim, name * ".gif",fps=10)

@@ -52,22 +52,37 @@ end
 """
 struct Laplacian2D 
     M 
- end 
+end 
  
- function Laplacian2D(g::Grid2D)
-     n = g.n
-     N = g.N 
-     
-     # these are the neighbours in x-direction 
-     M = diagm(0=>-4*ones(N), 1=>ones(N-1), -1=>ones(N-1))
-     
-     # these are the neighbours in y-direction
-     M += diagm(n=>ones(N-n), -n=>ones(N-n))
+function Laplacian2D(g::Grid2D)
+    n = g.n
+    N = g.N 
+    
+    # these are the neighbours in x-direction
+    # however this will include points that are not actually neighbours in the grid (n,n+1),(n+1,n)
+    # we thus will manually delete those form the array and replace them with the correct neighours 
+    # at the left and right boundary in the end 
+    M = diagm(0=>-4*ones(N), 1=>ones(N-1), -1=>ones(N-1))
+    for i=1:(n-1) 
+        M[i*n,i*n + 1] = 0
+        M[i*n + 1,i*n] = 0
+    end
 
-     # implement periodic boundary conditions
-     M += diagm(N-n=>ones(n), n-N=>ones(n), N-1=>[1.], 1-N=>[1.])
+    # these are the neighbours in y-direction
+    M += diagm(n=>ones(N-n), -n=>ones(N-n))
 
-     Laplacian2D(sparse(M./(g.h_x^2)))
- end
+    # these are the neighours of the grid points at the upper boundary
+    M += diagm(N-n => ones(n))
+
+    # these are the neighbours of the grid points at the lower boundary 
+    M += diagm(-N+n => ones(n))
+    
+    for i=1:n:N # loop over left and right boundary points
+       M[i,i+(n-1)] = 1
+       M[i+(n-1),i] = 1
+    end 
+
+    Laplacian2D(sparse(M./(g.h_x^2)))
+end
  
  (Δ::Laplacian2D)(x) = Δ.M * x
